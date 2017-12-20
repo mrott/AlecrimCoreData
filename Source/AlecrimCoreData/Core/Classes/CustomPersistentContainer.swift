@@ -90,6 +90,7 @@ internal class CustomPersistentContainer: NSObject, UnderlyingPersistentContaine
     
     internal let name: String
     internal let viewContext: NSManagedObjectContext
+    internal let masterViewContext: NSManagedObjectContext
     internal var managedObjectModel: NSManagedObjectModel { return self.persistentStoreCoordinator.managedObjectModel }
     internal let persistentStoreCoordinator: NSPersistentStoreCoordinator
     internal var alc_persistentStoreDescriptions: [PersistentStoreDescription]
@@ -102,8 +103,11 @@ internal class CustomPersistentContainer: NSObject, UnderlyingPersistentContaine
         self.name = name
         self.persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: model)
         
+        self.masterViewContext = self.contextType.init(concurrencyType: .privateQueueConcurrencyType)
+        self.masterViewContext.persistentStoreCoordinator = self.persistentStoreCoordinator
+        
         self.viewContext = self.contextType.init(concurrencyType: .mainQueueConcurrencyType)
-        self.viewContext.persistentStoreCoordinator = self.persistentStoreCoordinator
+        self.viewContext.parent = self.masterViewContext
         
         self.alc_persistentStoreDescriptions = [CustomPersistentStoreDescription(url: type(of: self).defaultDirectoryURL().appendingPathComponent("\(name).sqlite"))]
     }

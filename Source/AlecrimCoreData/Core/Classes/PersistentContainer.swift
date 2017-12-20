@@ -48,6 +48,7 @@ internal protocol UnderlyingPersistentContainer: class {
     var persistentStoreCoordinator: NSPersistentStoreCoordinator { get }
     
     var viewContext: NSManagedObjectContext { get }
+    var masterViewContext: NSManagedObjectContext { get }
     var alc_persistentStoreDescriptions: [PersistentStoreDescription] { get set }
     
     func alc_loadPersistentStores(completionHandler block: @escaping (PersistentStoreDescription, Error?) -> Void)
@@ -82,6 +83,7 @@ open class GenericPersistentContainer<ContextType: NSManagedObjectContext> {
     public var name: String { return self.underlyingPersistentContainer.name }
     
     public var viewContext: ContextType { return self.underlyingPersistentContainer.viewContext as! ContextType }
+    public var masterViewContext: ContextType { return self.underlyingPersistentContainer.masterViewContext as! ContextType }
     
     public var managedObjectModel: NSManagedObjectModel { return self.underlyingPersistentContainer.managedObjectModel }
     
@@ -132,6 +134,7 @@ open class GenericPersistentContainer<ContextType: NSManagedObjectContext> {
         
         //
         self.underlyingPersistentContainer.configureDefaults(for: self.viewContext)
+        self.underlyingPersistentContainer.configureDefaults(for: self.masterViewContext)
         
         //
         if automaticallyLoadPersistentStores {
